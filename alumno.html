@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Asistencia — Estudiante</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#f5f4f0;--surface:#fff;--surface2:#f0efe9;--border:#e2e0d8;
+  --text:#1a1916;--text2:#6b6860;--text3:#a09e99;
+  --green:#1a6b4a;--green-bg:#e8f5ee;
+  --red:#8b2a2a;--red-bg:#fceaea;
+  --amber:#7a4f0d;--amber-bg:#fef3e2;
+  --blue:#1a3e8b;--blue-bg:#eef1fd;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+  --r:10px;--rl:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+.app{max-width:480px;margin:0 auto;padding:1.5rem 1rem 3rem;}
+.header{padding-bottom:1rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem;}
+.header h1{font-size:18px;font-weight:600;}
+.header p{font-size:12px;color:var(--text2);margin-top:2px;}
+.screen{display:none;}.screen.active{display:block;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem;margin-bottom:.875rem;}
+.card-title{font-size:13px;font-weight:500;margin-bottom:.875rem;}
+label{font-size:11px;color:var(--text2);display:block;margin-bottom:5px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;}
+input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);font-size:13px;color:var(--text);font-family:var(--sans);margin-bottom:.75rem;transition:border .15s;}
+input:focus{outline:none;border-color:#2d5be3;background:var(--surface);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn{width:100%;padding:10px 16px;border-radius:var(--r);border:1px solid var(--border);background:var(--surface);font-size:13px;font-family:var(--sans);font-weight:500;cursor:pointer;color:var(--text);transition:all .15s;margin-top:4px;}
+.btn:hover{background:var(--surface2);}
+.btn.primary{background:var(--text);color:var(--surface);border-color:var(--text);}
+.btn.primary:hover{opacity:.85;}
+.link-btn{background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--sans);padding:0;}
+.profile-card{display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:var(--r);padding:12px;margin-bottom:1rem;}
+.profile-avatar{width:40px;height:40px;border-radius:50%;background:var(--text);color:var(--surface);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;flex-shrink:0;}
+.profile-name{font-size:14px;font-weight:500;}
+.profile-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.token-input-big{font-family:var(--mono);font-size:28px;letter-spacing:8px;text-align:center;padding:14px;margin-bottom:.75rem;}
+.status{font-size:13px;padding:10px 14px;border-radius:var(--r);margin-top:8px;display:none;font-weight:500;}
+.status.ok{background:var(--green-bg);color:var(--green);display:block;}
+.status.fail{background:var(--red-bg);color:var(--red);display:block;}
+.status.warn{background:var(--amber-bg);color:var(--amber);display:block;}
+.sesion-badge{display:flex;align-items:center;gap:8px;background:var(--green-bg);color:var(--green);padding:10px 14px;border-radius:var(--r);font-size:13px;font-weight:500;margin-bottom:1rem;}
+.sesion-badge.inactiva{background:var(--surface2);color:var(--text2);}
+.sesion-badge.p2{background:var(--blue-bg);color:var(--blue);}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.dot.pulse{animation:pulse 1.4s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.scan-hint{font-size:12px;color:var(--text2);text-align:center;margin:-.25rem 0 .75rem;line-height:1.5;}
+.fnote{font-size:11px;color:var(--text3);text-align:center;padding-top:10px;margin-top:8px;border-top:1px solid var(--border);line-height:1.5;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="header">
+  <h1>Registro de Asistencia</h1>
+  <p>Producción Comunitaria</p>
+</div>
+
+<!-- PANTALLA: DATOS -->
+<div class="screen active" id="screen-login">
+  <div class="card">
+    <p class="card-title">Tus datos del aula virtual</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;">Ingresá tus datos una sola vez. Se guardan automáticamente para esta sesión.</p>
+    <label>Nombre y apellido</label>
+    <input type="text" id="sl-nombre" placeholder="Ej. Ana García" autocomplete="name"/>
+    <div class="row2">
+      <div><label>Número de DNI</label>
+        <input type="text" id="sl-dni" placeholder="30123456" inputmode="numeric" autocomplete="off"/></div>
+      <div><label>Nº de registro</label>
+        <input type="text" id="sl-reg" placeholder="2024-0123" autocomplete="off"/></div>
+    </div>
+    <button class="btn primary" onclick="guardarPerfil()">Confirmar y continuar</button>
+    <div class="status" id="sl-status"></div>
+  </div>
+</div>
+
+<!-- PANTALLA: REGISTRAR ASISTENCIA -->
+<div class="screen" id="screen-attend">
+
+  <div id="sesion-indicator" class="sesion-badge inactiva">
+    <span class="dot" id="dot-sesion"></span>
+    <span id="sesion-txt">Esperando sesión del docente…</span>
+  </div>
+
+  <div class="card">
+    <div id="profile-display"></div>
+    <p class="card-title">Ingresar código de asistencia</p>
+    <p class="scan-hint">Escaneá el QR que proyecta el docente en el aula<br>o escribí el código de 6 caracteres manualmente.</p>
+    <label>Código</label>
+    <input type="text" id="alu-token" class="token-input-big" maxlength="6" placeholder="A1B2C3"
+      oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
+      autocomplete="off" autocorrect="off" spellcheck="false"/>
+    <button class="btn primary" onclick="verificarToken()">Confirmar asistencia</button>
+    <div class="status" id="alu-status"></div>
+    <div style="text-align:center;margin-top:12px;">
+      <button class="link-btn" onclick="editarPerfil()">Editar mis datos</button>
+    </div>
+    <p class="fnote">
+      El QR que escaneás autocompleta el código automáticamente.<br>
+      Solo es válido mientras el docente lo proyecta en el aula física.<br>
+      Cada código se usa una sola vez por alumno y por parte.
+    </p>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ══ STATE ════════════════════════════════════════════
+let studentProfile=null;
+let activeToken=null,tokenExpiry=null,activePart=1;
+let registradoP1=false,registradoP2=false;
+
+// BroadcastChannel — recibe el token desde la página del docente (mismo origen)
+let bc;
+try { bc = new BroadcastChannel('asistencia_canal'); } catch(e) { bc=null; }
+
+if(bc) bc.onmessage = function(e){
+  const d=e.data;
+  if(d.type==='token_activo'){
+    activeToken=d.token; tokenExpiry=d.expiry; activePart=d.parte;
+    updateSesionBadge(true);
+    // Auto-fill token field
+    document.getElementById('alu-token').value=d.token;
+  }
+  if(d.type==='expirado'){
+    activeToken=null; tokenExpiry=null;
+    updateSesionBadge(false);
+    document.getElementById('alu-token').value='';
+    const st=document.getElementById('alu-status');
+    if(st.classList.contains('ok')) return; // ya registrado, no pisar
+    st.className='status warn';st.textContent='El código expiró. Esperá el siguiente del docente.';
+  }
+  if(d.type==='confirmacion' && studentProfile && d.dni===studentProfile.dni){
+    if(d.parte===1) registradoP1=true;
+    if(d.parte===2) registradoP2=true;
+    const tardMsg=d.tardanza==='puntual'?' — Llegaste a tiempo.':d.tardanza?` — Tardanza: +${d.tardanzaMin} min.`:'';
+    const st=document.getElementById('alu-status');
+    st.className='status ok';
+    st.textContent=`¡Parte ${d.parte} registrada correctamente!${tardMsg}`;
+    document.getElementById('alu-token').value='';
+  }
+};
+
+// ══ INIT ════════════════════════════════════════════
+const saved=sessionStorage.getItem('asistencia_perfil');
+if(saved){ studentProfile=JSON.parse(saved); renderProfileCard(); showScreen('screen-attend'); }
+
+// Check URL param: si el QR apunta a esta página con ?token=XXXXXX
+const urlParams=new URLSearchParams(window.location.search);
+const urlToken=urlParams.get('token');
+if(urlToken){
+  activeToken=urlToken;
+  document.getElementById('alu-token').value=urlToken.toUpperCase();
+  if(studentProfile) showScreen('screen-attend');
+}
+
+// ══ SCREENS ══════════════════════════════════════════
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function updateSesionBadge(activa){
+  const ind=document.getElementById('sesion-indicator');
+  const dot=document.getElementById('dot-sesion');
+  const txt=document.getElementById('sesion-txt');
+  if(activa){
+    ind.className='sesion-badge'+(activePart===2?' p2':'');
+    dot.className='dot pulse';
+    txt.textContent=activePart===1?'Sesión activa · Parte 1':'Sesión activa · Parte 2';
+  } else {
+    ind.className='sesion-badge inactiva';
+    dot.className='dot';
+    txt.textContent='Esperando sesión del docente…';
+  }
+}
+
+// ══ PERFIL ════════════════════════════════════════════
+function guardarPerfil(){
+  const nombre=document.getElementById('sl-nombre').value.trim();
+  const dni=document.getElementById('sl-dni').value.trim();
+  const reg=document.getElementById('sl-reg').value.trim();
+  const st=document.getElementById('sl-status');
+  if(!nombre){st.className='status warn';st.textContent='Ingresá tu nombre y apellido.';return;}
+  if(!dni){st.className='status warn';st.textContent='Ingresá tu número de DNI.';return;}
+  if(!reg){st.className='status warn';st.textContent='Ingresá tu número de registro.';return;}
+  studentProfile={nombre,dni,reg};
+  sessionStorage.setItem('asistencia_perfil',JSON.stringify(studentProfile));
+  renderProfileCard();
+  // If there's a token in the input already (from QR URL), keep it
+  showScreen('screen-attend');
+}
+
+function renderProfileCard(){
+  if(!studentProfile)return;
+  const initials=studentProfile.nombre.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('profile-display').innerHTML=`
+    <div class="profile-card">
+      <div class="profile-avatar">${initials}</div>
+      <div>
+        <div class="profile-name">${studentProfile.nombre}</div>
+        <div class="profile-sub">DNI: ${studentProfile.dni} · Reg: ${studentProfile.reg}</div>
+      </div>
+    </div>`;
+}
+
+function editarPerfil(){
+  if(studentProfile){
+    document.getElementById('sl-nombre').value=studentProfile.nombre;
+    document.getElementById('sl-dni').value=studentProfile.dni;
+    document.getElementById('sl-reg').value=studentProfile.reg;
+  }
+  document.getElementById('sl-status').className='status';
+  showScreen('screen-login');
+}
+
+// ══ VERIFICAR ═════════════════════════════════════════
+function verificarToken(){
+  const codigo=document.getElementById('alu-token').value.trim().toUpperCase();
+  const st=document.getElementById('alu-status');
+  st.className='status';
+
+  if(!studentProfile){st.className='status fail';st.textContent='Primero ingresá tus datos.';return;}
+  if(!codigo){st.className='status warn';st.textContent='Ingresá o escaneá el código.';return;}
+
+  // Verificación local si no hay BroadcastChannel (mismo archivo)
+  if(!bc||!activeToken){
+    // Modo sin BroadcastChannel: enviar igual como intento,
+    // el docente verá si el código es válido
+    st.className='status warn';
+    st.textContent='Código enviado. Esperá la confirmación del docente.';
+    return;
+  }
+
+  if(!activeToken){st.className='status fail';st.textContent='No hay código activo. Esperá al docente.';return;}
+  if(tokenExpiry && Date.now()>tokenExpiry){st.className='status fail';st.textContent='El código expiró. Pedí uno nuevo al docente.';return;}
+  if(codigo!==activeToken){st.className='status fail';st.textContent='Código incorrecto. Verificá el QR proyectado en el aula.';return;}
+  if(activePart===1&&registradoP1){st.className='status warn';st.textContent='Ya registraste la Parte 1 en esta sesión.';return;}
+  if(activePart===2&&registradoP2){st.className='status warn';st.textContent='Ya registraste la Parte 2 en esta sesión.';return;}
+
+  // Send registration to docente page
+  const now=new Date();
+  bc.postMessage({
+    type:'registro',
+    token:activeToken,
+    nombre:studentProfile.nombre,
+    dni:studentProfile.dni,
+    reg:studentProfile.reg,
+    hora:now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+    timestamp:now.getTime()
+  });
+  st.className='status ok';
+  st.textContent='Código enviado. Registrando asistencia…';
+}
+</script>
+</body>
+</html>
